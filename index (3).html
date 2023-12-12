@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sumo Game</title>
+  <style>
+    /* Stili per il campo da gioco */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f3f3f3;
+    }
+
+    #field {
+      width: 500px;
+      height: 500px;
+      background-color: green;
+      position: relative;
+      border: 4px solid #333;
+      border-radius: 8px;
+    }
+
+    /* Stili per il cerchio al centro */
+    #centerCircle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: white;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* Stili per i bottoni dei giocatori */
+    .playerButton {
+      display: block;
+      width: 100px;
+      height: 50px;
+      margin-top: 20px;
+      position: absolute;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #player1Button {
+      left: calc(50% - 250px);
+      top: 510px; /* Spostamento sotto il campo */
+    }
+
+    #player2Button {
+      left: calc(50% + 150px);
+      top: 510px; /* Spostamento sotto il campo */
+    }
+
+    /* Stili per il pulsante di avvio */
+    #startButton {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 40px;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    /* Stili per il display del timer */
+    #timerDisplay {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div id="field">
+    <div id="centerCircle"></div>
+  </div>
+  <button id="player1Button" class="playerButton" disabled>Move Player 1</button>
+  <button id="player2Button" class="playerButton" disabled>Move Player 2</button>
+  <button id="startButton">Start Game</button>
+  <span id="timerDisplay">Timer: 60 seconds</span>
+
+  <script>
+    const player1Button = document.getElementById('player1Button');
+    const player2Button = document.getElementById('player2Button');
+    const centerCircle = document.getElementById('centerCircle');
+    const startButton = document.getElementById('startButton');
+    const timerDisplay = document.getElementById('timerDisplay');
+
+    let position = 50; // Posizione iniziale dell'immagine (0-100)
+    let gameStarted = false;
+    let timer;
+    let secondsLeft = 60; // 60 secondi di gioco
+
+    player1Button.addEventListener('click', () => {
+      if (gameStarted && position > 0) {
+        position--; // Movimento verso il player 2
+        centerCircle.style.left = position + "%";
+        checkWinner();
+      }
+    });
+
+    player2Button.addEventListener('click', () => {
+      if (gameStarted && position < 100) {
+        position++; // Movimento verso il player 1
+        centerCircle.style.left = position + "%";
+        checkWinner();
+      }
+    });
+
+    startButton.addEventListener('click', () => {
+      if (!gameStarted) {
+        gameStarted = true;
+        startButton.disabled = true; // Disabilita il pulsante di avvio dopo l'inizio del gioco
+        player1Button.disabled = false; // Abilita i pulsanti dei giocatori
+        player2Button.disabled = false;
+        timer = setInterval(() => {
+          secondsLeft--;
+          if (secondsLeft <= 0 || position <= 0 || position >= 100) {
+            clearInterval(timer);
+            endGame();
+          }
+          timerDisplay.innerText = secondsLeft; // Aggiorna il display del timer
+        }, 1000);
+      }
+    });
+
+    function checkWinner() {
+      if (position <= 0) {
+        // Player 1 vince
+        clearInterval(timer);
+        alert("Player 1 wins!");
+        resetGame();
+      } else if (position >= 100) {
+        // Player 2 vince
+        clearInterval(timer);
+        alert("Player 2 wins!");
+        resetGame();
+      }
+    }
+
+    function endGame() {
+      if (position <= 0 || position >= 100) {
+        alert("Time's up!");
+        resetGame();
+      }
+    }
+
+    function resetGame() {
+      // Reimposta la posizione iniziale dell'immagine e altre variabili di gioco se necessario
+      position = 50;
+      centerCircle.style.left = position + "%";
+      gameStarted = false;
+      secondsLeft = 60;
+
+      // Disabilita i pulsanti dei giocatori e abilita il pulsante di avvio
+      player1Button.disabled = true;
+      player2Button.disabled = true;
+      startButton.disabled = false;
+
+      // Resetta il display del timer
+      timerDisplay.innerText = secondsLeft;
+    }
+  </script>
+</body>
+</html>
